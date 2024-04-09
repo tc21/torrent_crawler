@@ -1,9 +1,6 @@
 use colored::Colorize;
 use scraper::{Html, Selector, ElementRef};
 
-use crate::Args;
-
-
 #[derive(Debug)]
 pub struct Entry {
     pub title: String,
@@ -12,13 +9,13 @@ pub struct Entry {
 
 const MAX_PAGES_TO_SEARCH: usize = 10;
 
-pub async fn find_with_args(args: &Args) -> Result<Vec<Entry>, Box<dyn std::error::Error>> {
+pub async fn find(search_string: &str, episode: i32) -> Result<Vec<Entry>, Box<dyn std::error::Error>> {
     for page_number in 1..=MAX_PAGES_TO_SEARCH {
         eprintln!("searching page {}", page_number);
-        let page = get_page(&args.name, page_number)
+        let page = get_page(search_string, page_number)
             .await?;
 
-        let rows = find_in_page(&args, &page);
+        let rows = find_in_page(episode, &page);
 
         if rows.len() == 0 && has_next_page(&page) {
             continue
@@ -30,13 +27,13 @@ pub async fn find_with_args(args: &Args) -> Result<Vec<Entry>, Box<dyn std::erro
     Ok(vec![])
 }
 
-fn find_in_page(args: &Args, page: &Html) -> Vec<Entry> {
+fn find_in_page(episode: i32, page: &Html) -> Vec<Entry> {
     let row_selector = Selector::parse(".torrent-list > tbody > tr").unwrap();
 
     page.select(&row_selector)
         .map(|row| parse_row(&row))
         .filter_map(|row| ok_or_print_error(row))
-        .filter(|row| matches(&row.title, &args.episode))
+        .filter(|row| matches(&row.title, episode))
         .collect::<Vec<_>>()
 }
 
@@ -71,11 +68,8 @@ fn has_next_page(page: &Html) -> bool {
     }
 }
 
-fn matches(title: &str, episode: &Option<String>) -> bool {
-    match episode {
-        Some(e) => title.contains(&format!(" - {:0>2}", e)) || title.contains(&format!("E{:0>2}", e)),
-        None => true,
-    }
+fn matches(title: &str, e: i32) -> bool {
+    title.contains(&format!(" - {:0>2}", e)) || title.contains(&format!("E{:0>2}", e))
 }
 
 async fn get_page(search_string: &str, page: usize) -> Result<Html, Box<dyn std::error::Error>> {

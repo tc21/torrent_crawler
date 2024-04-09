@@ -6,9 +6,19 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = "0.11.22"
-scraper = "0.18.1"
-clap = { version = "4.4.6", features = ["derive"] }
-tokio = { version = "1.33.0", features = ["full"] }
-lazy_static = "1.4.0"
-colored = "2.0.4"
+reqwest = "0.12"
+scraper = "0.19"
+clap = { version = "4.4", features = ["derive"] }
+tokio = { version = "1.33", features = ["full"] }
+lazy_static = "1.4"
+colored = "2.0"
+config = "0.14"
+serde = "1.0"
+serde_json = "1.0"
+rusqlite = "0.31"
+transmission-rpc = { version = "0.4", optional = true }
+
+
+[[bin]]
+name = "add_to_transmission"
+required-features = ["transmission-rpc"]

@@ -1,0 +1,12 @@
+{
+    "on_new_episode": [
+        {
+            "command": "./add_to_transmission",
+            "args": ["http://172.16.1.194:30096/transmission/rpc", "$url"]
+        },
+        {
+            "command": "notify-send",
+            "args": ["Downloading new episode", "$title: episode $episode"]
+        }
+    ]
+}
