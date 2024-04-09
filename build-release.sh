@@ -1,3 +1,5 @@
+#! /bin/bash
+
 cargo build --release --all-features
 
 if [[ -d out ]]; then
